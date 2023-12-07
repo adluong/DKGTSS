@@ -1,5 +1,7 @@
 # Distribute Key Generation experiments
-This is a source code for the paper: Practical Distributed Key Generation Using Two-Round Secret Sharing.\\
+This is a source code for the paper: Practical Distributed Key Generation Using Two-Round Secret Sharing.
+
+
 This repository comprises:
 
 **1. Smart contract**
