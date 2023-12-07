@@ -94,4 +94,3 @@ if __name__ == "__main__":
         shares[i] = [37821381+i, gfx[i]]
 
     print(reconstruct(shares))
-    print("abc")
