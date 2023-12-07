@@ -1,0 +1,55 @@
+import "ecc/edwardsScalarMult" as scalarMult;
+import "ecc/edwardsAdd" as add;
+import "utils/pack/bool/nonStrictUnpack256" as unpack256bool;
+from "ecc/babyjubjubParams" import BabyJubJubParams;
+import "ecc/babyjubjubParams" as context;
+import "hashes/poseidon/poseidon" as poseidon;
+ 
+def main(private field w, private field r, private field[16][2] z, field[2] hashval, field[2] pf) -> field[4]{
+  BabyJubJubParams context = context();
+  field[2] G = [context.Gu, context.Gv];
+
+  // field r = 11111994;
+  bool[256] rbit = unpack256bool(r);
+  bool[256] wbit = unpack256bool(w);
+ 
+  //compute zeta. Instead of sampling zeta from E(F_p), user can sample w in Zq and compute zeta
+  field[2] zeta = scalarMult(wbit,G,context);
+  field sf = poseidon(zeta);
+
+  //1. compute public key pf
+  bool[256] sfbit = unpack256bool(sf);
+  field[2] pf = scalarMult(sfbit, G, context);
+
+  //2. compute hash_1 = H([z]_n)
+  field[5] mut buf = [0,0,0,0,0];
+  u32 mut j = 0;
+  for u32 i in 0..5{
+    buf[i] = poseidon([z[j][0],z[j][1],z[j+1][0],z[j+1][1],z[j+2][0],z[j+2][1]]);
+    j = j+3;}
+  field[2] mut sfin = [0,0];
+  sfin[0] = poseidon([buf[0],buf[1],buf[2],buf[3],buf[4]]);
+  sfin[1] = poseidon([z[15][0],z[15][1],sfin[0]]);
+
+  //2. compute [y]_n
+  field[16][2] mut y =  [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0], [0,0], [0,0], [0,0], [0,0],\ 
+                         [0,0], [0,0], [0,0], [0,0], [0,0], [0,0]];
+  //yi = zi^r . zeta
+  for u32 i in 0..16{
+    y[i] = add(zeta, scalarMult(rbit, z[i], context), context);
+  }
+  
+  //3. compute hash_2 = H([y]_n)
+  field[5] mut bufy = [0,0,0,0,0];
+  j = 0;
+  for u32 i in 0..5{
+    bufy[i] = poseidon([y[j][0],y[j][1],y[j+1][0],y[j+1][1],y[j+2][0],y[j+2][1]]);
+    j = j+3;
+  }
+
+  field[2] mut sfiny = [0,0];
+  sfiny[0] = poseidon([bufy[0], bufy[1], bufy[2], bufy[3], bufy[4]]);
+  sfiny[1] = poseidon([y[15][0],y[15][1], sfiny[0]]);
+
+  return [pf[0], pf[1], sfin[1],sfiny[1]];
+}
