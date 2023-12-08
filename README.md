@@ -20,11 +20,12 @@ zokrates generate-proof -s gm17
 zokrates print-proof --format remix
 ```
 - The output is the proof string $\pi$ and public input/output ($\vec{v},\vec{o}$). They can be passed directly to the smart contract functions \texttt{verifyC1}, \texttt{verifyC2}, etc.
+- 
 **3. Two-Round secret sharing (TSS)**
 - tss.py generated using the library: https://github.com/Zokrates/pycrypto.
-- You can modify parameters or the threshold number in tss.py. By default, the threshold is $t=9$ and $n=16$.
+- Parameters or the threshold number in tss.py can be modified. By default, the threshold is $t=9$ and $n=16$.
 - tss.py generate (1) public parameter set, (2) function $\mathsf{ComX^{TSS}}$ for $n$ parties, (3) Function $\mathsf{GenY^{TSS}}$ for $n$ parties, and (4) function $\mathsf{Rec^{TSS}} using $t$ shares.
-- to test TSS functions:
+- To test TSS functions:
 ```
 python3 DKGTSS/tss.py
 ```
