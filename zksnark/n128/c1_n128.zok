@@ -235,5 +235,5 @@ def main(private field x) -> field[2][2]{
   }
   //2. compute a simple commitment c = g^x
   field[2] c = scalarMult(xbit1, G, context);
-  return [z,gx];
+  return [z,c];
 }
