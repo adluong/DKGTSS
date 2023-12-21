@@ -24,7 +24,7 @@ zokrates print-proof --format remix
 **3. Two-Round secret sharing (TSS)**
 - tss.py generated using the library: https://github.com/Zokrates/pycrypto.
 - Parameters or the threshold number in tss.py can be modified. By default, the threshold is $t=9$ and $n=16$.
-- tss.py generate (1) public parameter set, (2) function $\mathsf{ComX^{TSS}}$ for $n$ parties, (3) Function $\mathsf{GenY^{TSS}}$ for $n$ parties, and (4) function $\mathsf{Rec^{TSS}} using $t$ shares.
+- tss.py generate (1) public parameter set, (2) function $\mathsf{ComX^{TSS}}$ for $n$ parties, (3) Function $\mathsf{GenY^{TSS}}$ for $n$ parties, and (4) function $\mathsf{Rec^{TSS}}$ using $t$ shares.
 - To test TSS functions:
 ```
 python3 DKGTSS/tss.py
