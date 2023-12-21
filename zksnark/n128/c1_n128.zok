@@ -233,7 +233,7 @@ def main(private field x) -> field[2][2]{
   for u32 i in 0..65{
     z = add(z, gx[i], context);
   }
-  //2. compute a simple commitment gx = c = g^x
-  field[2] gx = scalarMult(xbit1, G, context);
+  //2. compute a simple commitment c = g^x
+  field[2] c = scalarMult(xbit1, G, context);
   return [z,gx];
 }
