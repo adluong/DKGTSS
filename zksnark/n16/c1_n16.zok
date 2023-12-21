@@ -41,8 +41,8 @@ def main(private field x) -> field[2][2] {
   
   field[2] mut z = [0,1];
 
-  field[9][2] gx = [gx1,gx2,gx3,gx4,gx5,gx6,gx7,gx8,G];
-  for u32 i in 0..9{
+  field[8][2] gx = [gx1,gx2,gx3,gx4,gx5,gx6,gx7,gx8];
+  for u32 i in 0..8{
     z = add(z, gx[i], context);
   }
   field[2] c = scalarMult(xbit1, G, context);
