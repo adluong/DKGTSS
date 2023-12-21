@@ -561,15 +561,15 @@ contract Verifier {
         Pairing.G1Point c;
     }
     //===========================================================================
-    //Functions for the paper
-    //===========================================================================
+    //Functions for paper
     struct Record{
         uint256[2]      z;
         uint256[2]      pk;
         uint256[2]      c;
         uint            stake;
         uint256         x;
-        bool[3]         stt;
+        bool[2]         stt;
+        bool[2]         rp;
     }
 
     mapping (address => Record)     l1; //list user
@@ -588,15 +588,16 @@ contract Verifier {
     event ListHash(uint256[3][]);
     // event Rec(Record node);
 
-    uint constant public stake_amount = 1 ether; 
+    uint constant public stake_amount = 1 ether;
+    uint public current_time = block.timestamp;
+    uint public time1 = 1702467018;
+    uint public time2 = 1702467018;
     
     function verifyC1(Proof memory proof, uint[4] memory input) payable public returns(bool){
         //require the caller has not called this function yet
-        require(l1[msg.sender].stt[0] == false);
-        require(l1[msg.sender].stt[1] == false);
         require(msg.value >= stake_amount);
+        require(l1[msg.sender].stt[0] == false);
         uint[] memory inputValues = new uint[](4);
-        
         for(uint i = 0; i < input.length; i++){
             inputValues[i] = input[i];
         }
@@ -604,10 +605,10 @@ contract Verifier {
             l1[msg.sender].z = [inputValues[0],inputValues[1]];
             l1[msg.sender].c = [inputValues[2],inputValues[3]];
             l1[msg.sender].stake = msg.value;
-            //deposit is withdrawable
-            l1[msg.sender].stt[0] = true;
+            //deposit is withdrawable by x
+            l1[msg.sender].rp[1] = true;
             //done PInit
-            l1[msg.sender].stt[1] = true;
+            l1[msg.sender].stt[0] = true;
             z.push([uint256(uint160(msg.sender)),inputValues[0],inputValues[1]]);
             return true;
         } else {
@@ -616,19 +617,19 @@ contract Verifier {
     }
     
     function verifyC2(Proof memory proof, uint[4] memory input) public returns(bool){
-        //require the stake amount is valid
+        require(l1[msg.sender].stt[0] == true);
+        require(l1[msg.sender].stt[1] == false);
         uint[] memory inputValues = new uint[](4);
         for(uint i = 0; i < input.length; i++){
             inputValues[i] = input[i];
         }
-        require(l1[msg.sender].stt[2] == false);
         if (verify(inputValues, proof, 2) == 0) {
             l1[msg.sender].pk = [inputValues[0],inputValues[1]];
-            //DInit done
-            l1[msg.sender].stt[2] = true;
-
             pk.push([inputValues[0],inputValues[1]]);
             hash.push([uint256(uint160(msg.sender)), inputValues[2],inputValues[3]]);
+            l1[msg.sender].rp[0] = true;
+            //DInit done
+            l1[msg.sender].stt[1] = true;
             return true;
         } else {
             return false;
@@ -639,8 +640,8 @@ contract Verifier {
 
 
     function report(address target, Proof memory proof, uint[3] memory input) public returns(bool){
-        require((l1[target].pk[0] == input[1] && l1[target].pk[1] == input[2]) || (l1[target].z[0] == input[1] && l1[target].z[1] == input[2]));
-        require(l1[target].stt[0] == true);
+        require((l1[target].pk[0] == input[1] && l1[target].pk[1] == input[2]) || (l1[target].c[0] == input[1] && l1[target].c[1] == input[2]));
+        require(l1[target].rp[0] == true || l1[target].rp[1] == true);
         uint[] memory inputValues = new uint[](3);
         for(uint i = 0; i < input.length; i++){
             inputValues[i] = input[i];
@@ -648,8 +649,8 @@ contract Verifier {
         if (verify(inputValues, proof, 3) == 0) {
             l1[target].stake = 0;
             l1[msg.sender].stake += l1[target].stake/2;
-            l1[msg.sender].stt[0] = false;
-            l1[target].stt[0] = false;
+            l1[msg.sender].rp = [false,false];
+            l1[target].rp = [false,false];
             return true;
         } else {
             return false;
@@ -658,6 +659,7 @@ contract Verifier {
 
     //lai proof nua a?
     function submitSK(Proof memory proof, uint[3] memory input) public returns (bool){
+        require(block.timestamp >= time1);
         require(l1[msg.sender].pk[0] == input[1]);  //pkf x
         require(l1[msg.sender].pk[1] == input[2]);  //pkf y
         uint[] memory inputValues = new uint[](3);
@@ -665,8 +667,8 @@ contract Verifier {
             inputValues[i] = input[i];
         }
         if (verify(inputValues, proof,3) == 0) {
-            // l1[msg.sender].sk = inputValues[0];
             sk.push(input[0]);
+            l1[msg.sender].rp[0] == false;
             return true;
         } else {
             return false;
@@ -674,6 +676,7 @@ contract Verifier {
     }
 
     function submitX(Proof memory proof, uint[3] memory input) public returns (bool){
+        require(block.timestamp >= time2);
         require(l1[msg.sender].c[0] == input[1]);  //pkf x
         require(l1[msg.sender].c[1] == input[2]);  //pkf y
         uint[] memory inputValues = new uint[](3);
@@ -683,6 +686,7 @@ contract Verifier {
         if (verify(inputValues, proof,3) == 0) {
             // l1[msg.sender].x = inputValues[0];  //add share to the list
             x.push(input[0]);
+            l1[msg.sender].rp[1] == false;
             return true;
         } else {
             return false;
@@ -751,7 +755,6 @@ contract Verifier {
         vk.query[4] = Pairing.G1Point(uint256(0x1c68cfc6ca1569553b9aaebb74f9a08b4b3b1ec93d38aafb5e7adde5b63c2f48), uint256(0x140c964d44cb27abd011dfd6fbb73384f92059571893c5d7bbcc0e664876bda2));
     }
 
-    //Because Solidity does not support BabyJubjub while pk is an element of Babyjubjub, the smart contract cannot compare pk with g^sk so we need to prove it offchain
     function verifyingKey3() pure internal returns (VerifyingKey memory vk) {
         vk.h= Pairing.G2Point([uint256(0x260dea6724029f2fa4a9a8e9a25801d2c73e6b5c35cfb16ed27bc699069ea2ab), uint256(0x11ecf7c05d3d2d58244481184bdf8e5fc7c97705e1e4c6326d3eb9d3d222a601)], [uint256(0x03abbf2588774fc741951fa698e862714f2eb1a2f9bafa3cb424586997b9510d), uint256(0x1677f892978ef8691f1ba45e24e262af48d1e762e82d7e4b1d18470c160b3ba6)]);
         vk.g_alpha = Pairing.G1Point(uint256(0x148b91c5737297dbf037c5a6b44427f3dfa3c1e3c746ed880bc207655ec715e5), uint256(0x2c3fa763e1f8ee200be41c269b79a76906e759c300490dbc1bc7d2d47487fba8));
