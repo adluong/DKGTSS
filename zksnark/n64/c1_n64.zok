@@ -122,11 +122,11 @@ def main(private field x) -> field[2][2]{
 
   field[2] mut z = [0,1];
 
-  field[33][2] gx = [gx1,gx2,gx3,gx4,gx5,gx6,gx7,gx8,gx9,gx10,\
+  field[32][2] gx = [gx1,gx2,gx3,gx4,gx5,gx6,gx7,gx8,gx9,gx10,\
                      gx11,gx12,gx13,gx14,gx15,gx16,gx17,gx18,gx19,gx20,\
                      gx21,gx22,gx23,gx24,gx25,gx26,gx27,gx28,gx29,gx30,\
-                     gx31,gx32,G];
-  for u32 i in 0..33{
+                     gx31,gx32];
+  for u32 i in 0..32{
     z = add(z, gx[i], context);
   }
   field[2] c = scalarMult(xbit1, G, context);
