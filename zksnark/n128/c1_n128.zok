@@ -230,7 +230,7 @@ def main(private field x) -> field[2][2]{
                      gx41,gx42,gx43,gx44,gx45,gx46,gx47,gx48,gx49,gx50,\
                      gx51,gx52,gx53,gx54,gx55,gx56,gx57,gx58,gx59,gx60,\
                      gx61,gx62,gx63,gx64];
-  for u32 i in 0..65{
+  for u32 i in 0..64{
     z = add(z, gx[i], context);
   }
   //2. compute a simple commitment c = g^x
