@@ -30,6 +30,7 @@ zokrates print-proof --format remix
 python3 DKGTSS/tss.py
 ```
 **4. Proof strings**
+
 _If the proof strings below are invalid, run the Zokrate setup process and update the corresponding verification key in the smart contract._
 VerifyC1
 ```
