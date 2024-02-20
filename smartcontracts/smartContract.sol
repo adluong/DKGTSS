@@ -657,7 +657,6 @@ contract Verifier {
         }
     }
 
-    //lai proof nua a?
     function submitSK(Proof memory proof, uint[3] memory input) public returns (bool){
         require(block.timestamp >= time1);
         require(l1[msg.sender].pk[0] == input[1]);  //pkf x
