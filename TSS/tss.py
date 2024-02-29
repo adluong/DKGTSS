@@ -88,9 +88,32 @@ if __name__ == "__main__":
     shares = [point.infinity() for x in range(n)]
     gfx = [point.infinity() for x in range(n)]
 
+    # for i in range(n):
+    #     ghx[i] = genZ(p, 37821381+i)
+    #     gfx[i] = genY(ghx[i], r, secret)
+    #     shares[i] = [37821381+i, gfx[i]]
+
+    # print(reconstruct(shares))
+
     for i in range(n):
+        start = time.time()
         ghx[i] = genZ(p, 37821381+i)
+        stop = time.time()
+    resz = stop - start
+    print(f"Average computation time of ComX: {resz}")
+
+    start = time.time()
+    for i in range(n):
         gfx[i] = genY(ghx[i], r, secret)
         shares[i] = [37821381+i, gfx[i]]
+    stop = time.time()
+    resy = stop - start
+    print(f"Computation time of GenY: {resy}")
 
-    print(reconstruct(shares))
+    start = time.time()
+    sec = reconstruct(shares)
+    stop = time.time()
+    res = stop - start
+    print(f"Computation time of Rec: {res}")
+
+    print(sec)
