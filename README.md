@@ -27,7 +27,7 @@ zokrates print-proof --format remix
 - tss.py generate (1) public parameter set, (2) function $\mathsf{ComX^{TSS}}$ for $n$ parties, (3) Function $\mathsf{GenY^{TSS}}$ for $n$ parties, and (4) function $\mathsf{Rec^{TSS}}$ using $t$ shares.
 - To test TSS functions:
 ```
-python3 DKGTSS/tss.py
+python3 TSS/tss.py
 ```
 **4. Proof strings**
 
